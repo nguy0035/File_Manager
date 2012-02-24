@@ -8,11 +8,14 @@ package GUI;
  *
  * @author tatthang
  */
+import java.util.*;
+import java.awt.List;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.text.DateFormat;
-import java.util.Date;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
 
 /** 
  * This class creates and displays a window containing a list of
@@ -21,9 +24,11 @@ import java.util.Date;
  * on an entry displays it, if a file, or lists it if a directory.
  * An optionally-specified FilenameFilter filters the displayed list.
  **/
-public class FileLister extends Frame implements ActionListener, ItemListener {
-    private List list;                  // To display the directory contents in
+public class FileLister extends Frame implements ActionListener, ItemListener,MouseListener {
+    private java.awt.List list;                  // To display the directory contents in
     private TextField details;          // To display detail info in.
+    private JPopupMenu Pmenu;
+    private JMenuItem rename,delete;
     private Panel buttons;              // Holds the buttons
     private Button up, close,delete_Btn,changeDir;           // The Up and Close buttons
     private File currentDir;            // The directory currently listed
@@ -32,6 +37,7 @@ public class FileLister extends Frame implements ActionListener, ItemListener {
     private DateFormat dateFormatter =  // To display dates and time correctly
           DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
     private File currentFile ; //a current file to be selected
+    private java.util.List<File> selectedFiles;
     /** 
      * Constructor: create the GUI, and list the initial directory. 
      **/
@@ -44,8 +50,9 @@ public class FileLister extends Frame implements ActionListener, ItemListener {
 		public void windowClosing(WindowEvent e) { dispose(); }
 	    });
 
-        list = new List(12, false);        // Set up the list
+        list = new java.awt.List(12, false);        // Set up the list
         list.setFont(new Font("MonoSpaced", Font.PLAIN, 14));
+        list.setMultipleMode(false);
         list.addActionListener(this);
         list.addItemListener(this);
         
@@ -77,6 +84,16 @@ public class FileLister extends Frame implements ActionListener, ItemListener {
         this.add(buttons, "South");
         this.setSize(500, 350);
         
+        Pmenu = new JPopupMenu();
+        rename = new JMenuItem("Rename");
+        delete = new JMenuItem("Delete");
+        rename.addActionListener(this);
+        delete.addActionListener(this);
+        
+        Pmenu.add(rename);
+        Pmenu.add(delete);
+        
+        list.addMouseListener(this);
         listDirectory(directory);          // And now list initial directory.
     }
     
@@ -114,24 +131,28 @@ public class FileLister extends Frame implements ActionListener, ItemListener {
      * about a file or directory. Then it displays that info.
      **/
     public void itemStateChanged(ItemEvent e) {
-        int i = list.getSelectedIndex() - 1;  // minus 1 for Up To Parent entry
-        if (i < 0) return;
-        String filename = files[i];               // Get the selected entry 
-        currentFile = new File(currentDir, filename);  // Convert to a File
-        if (!currentFile.exists())                          // Confirm that it exists
-            throw new IllegalArgumentException("FileLister: " +
-					       "no such file or directory");
+        
+       
+       
+            int i = list.getSelectedIndex() - 1;  // minus 1 for Up To Parent entry
+            if (i < 0) return;
+            String filename = files[i];               // Get the selected entry 
+            currentFile = new File(currentDir, filename);  // Convert to a File
+            if (!currentFile.exists())                          // Confirm that it exists
+                throw new IllegalArgumentException("FileLister: " +
+                                                "no such file or directory");
 
-        // Get the details about the file or directory, concatenate to a string
-        String info = filename;
-        if (currentFile.isDirectory()) info += File.separator;
-        info += " " + currentFile.length() + " bytes ";
-        info += dateFormatter.format(new java.util.Date(currentFile.lastModified()));
-        if (currentFile.canRead()) info += " Read";
-        if (currentFile.canWrite()) info += " Write";
-	
-        // And display the details string
-        details.setText(info);
+            // Get the details about the file or directory, concatenate to a string
+            String info = filename;
+            if (currentFile.isDirectory()) info += File.separator;
+            info += " " + currentFile.length() + " bytes ";
+            info += dateFormatter.format(new java.util.Date(currentFile.lastModified()));
+            if (currentFile.canRead()) info += " Read";
+            if (currentFile.canWrite()) info += " Write";
+
+            // And display the details string
+            details.setText(info);
+        
     }
     
     /**
@@ -143,8 +164,10 @@ public class FileLister extends Frame implements ActionListener, ItemListener {
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == close) this.dispose();
         else if (e.getSource() == up) { up(); }
-        else if (e.getSource() == delete_Btn) {deleteCurrentFile();}
+        else if (e.getSource() == delete_Btn) {deleteSelectedFiles();}
         else if (e.getSource() == changeDir) {changeCurrentDirectory();}
+        else if (e.getSource() == rename) {rename_file();}
+        else if (e.getSource() == delete) {System.out.println("DELETE");}
         else if (e.getSource() == list) {  // Double click on an item
             int i = list.getSelectedIndex(); // Check which item
             if (i == 0) up();                // Handle first Up To Parent item
@@ -157,9 +180,43 @@ public class FileLister extends Frame implements ActionListener, ItemListener {
             }
         }
     }
+
+    @Override
+    public void mouseClicked(MouseEvent e) {
+        
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent e) {
+        
+    }
+
+    @Override
+    public void mouseExited(MouseEvent e) {
+        
+    }
+
+    @Override
+    public void mousePressed(MouseEvent e) {
+        
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+        if (e.isPopupTrigger())
+            Pmenu.show(e.getComponent(),e.getX(),e.getY());
+    }
     
     private void changeCurrentDirectory(){
         listDirectory(this.details.getText());
+    }
+
+    private void rename_file(){
+        EditFileName_form form = new EditFileName_form(this.currentFile);
+        form.show();
+    }
+    private void deleteSelectedFiles(){
+            
     }
     private void deleteCurrentFile(){
         //to delete a file when a user pressed a button

@@ -11,6 +11,8 @@ package GUI;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
 
 /**
  * This class creates and displays a window containing a TextArea, 
