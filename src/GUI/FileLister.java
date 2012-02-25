@@ -28,7 +28,7 @@ public class FileLister extends Frame implements ActionListener, ItemListener,Mo
     private java.awt.List list;                  // To display the directory contents in
     private TextField details;          // To display detail info in.
     private JPopupMenu Pmenu;
-    private JMenuItem rename,delete;
+    private JMenuItem rename,delete,new_file;
     private Panel buttons;              // Holds the buttons
     private Button up, close,delete_Btn,changeDir;           // The Up and Close buttons
     private File currentDir;            // The directory currently listed
@@ -85,11 +85,15 @@ public class FileLister extends Frame implements ActionListener, ItemListener,Mo
         this.setSize(500, 350);
         
         Pmenu = new JPopupMenu();
+        new_file = new JMenuItem("New...");
         rename = new JMenuItem("Rename");
         delete = new JMenuItem("Delete");
+        new_file.addActionListener(this);
         rename.addActionListener(this);
         delete.addActionListener(this);
         
+        Pmenu.add(new_file);
+        Pmenu.add(new JPopupMenu.Separator());
         Pmenu.add(rename);
         Pmenu.add(delete);
         
@@ -166,6 +170,7 @@ public class FileLister extends Frame implements ActionListener, ItemListener,Mo
         else if (e.getSource() == up) { up(); }
         else if (e.getSource() == delete_Btn) {deleteSelectedFiles();}
         else if (e.getSource() == changeDir) {changeCurrentDirectory();}
+        else if (e.getSource() == new_file) {createNewFile();}
         else if (e.getSource() == rename) {rename_file();}
         else if (e.getSource() == delete) {System.out.println("DELETE");}
         else if (e.getSource() == list) {  // Double click on an item
@@ -211,6 +216,10 @@ public class FileLister extends Frame implements ActionListener, ItemListener,Mo
         listDirectory(this.details.getText());
     }
 
+    private void createNewFile(){
+        newfile_form form = new newfile_form(currentDir.getPath());
+        form.show();
+    }
     private void rename_file(){
         EditFileName_form form = new EditFileName_form(this.currentFile);
         form.show();

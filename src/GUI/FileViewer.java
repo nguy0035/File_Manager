@@ -42,7 +42,7 @@ public class FileViewer extends Frame implements ActionListener {
         // Create a TextArea to display the contents of the file in
         textarea = new TextArea("", 24, 80);
         textarea.setFont(new Font("MonoSpaced", Font.PLAIN, 12));
-        textarea.setEditable(false);
+        textarea.setEditable(true);
         this.add("Center", textarea);
         
         // Create a bottom panel to hold a couple of buttons in
@@ -53,6 +53,7 @@ public class FileViewer extends Frame implements ActionListener {
         // Create the buttons and arrange to handle button clicks
         Font font = new Font("SansSerif", Font.BOLD, 14);
         Button openfile = new Button("Open File");
+        Button saveFile = new Button("Save...");
         Button close = new Button("Close");
         openfile.addActionListener(this);
         openfile.setActionCommand("open");
@@ -60,7 +61,11 @@ public class FileViewer extends Frame implements ActionListener {
         close.addActionListener(this);
         close.setActionCommand("close");
         close.setFont(font);
+        saveFile.addActionListener(this);
+        saveFile.setActionCommand("Save...");
+        saveFile.setFont(font);
         p.add(openfile);
+        p.add(saveFile);
         p.add(close);
 	
         this.pack();
@@ -129,5 +134,7 @@ public class FileViewer extends Frame implements ActionListener {
         }
         else if (cmd.equals("close"))      // If user clicked "Close" button
             this.dispose();                  //    then close the window
+        else if (cmd.equals("Save..."))
+            System.out.println(textarea.getText());
     }
 }
